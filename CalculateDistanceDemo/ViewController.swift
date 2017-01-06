@@ -12,26 +12,21 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
-    
-    
     @IBOutlet weak var txtFrom: UITextField!
     @IBOutlet weak var txtTo: UITextField!
-    
     @IBOutlet weak var txtRouteInstructions: UITextView!
-    
-    
+    var startLocation:CLLocation!
+    var lastLocation: CLLocation!
+    var traveledDistance:Double = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
     }
     
-    @IBAction func calculateDistance(sender: AnyObject) {
+    @IBAction func calculateDistance(_ sender: AnyObject) {
         
-        
-        let from = txtFrom.text!.componentsSeparatedByString(", ")
-        let to = txtTo.text!.componentsSeparatedByString(", ")
+        let from = txtFrom.text!.components(separatedBy: ", ")
+        let to = txtTo.text!.components(separatedBy: ", ")
         
         let fromLat = Double(from[0])
         let fromLong = Double(from[1])
@@ -41,15 +36,12 @@ class ViewController: UIViewController {
         let locationFrom = CLLocation(latitude: fromLat!, longitude: fromLong!)
         let lcoationTo = CLLocation(latitude: toLat!, longitude: toLong!)
         
-        print("Aerial Distance - \(locationFrom.distanceFromLocation(lcoationTo)) meters")
+        print("Aerial Distance - \(locationFrom.distance(from: lcoationTo)) meters")
         
         self.caculateDistance(fromLat!, fromLong: fromLong!, toLat: toLat!, toLong: toLong!)
-        
     }
     
-    
-    
-    func caculateDistance(fromLat:Double, fromLong:Double, toLat:Double, toLong:Double){
+    func caculateDistance(_ fromLat:Double, fromLong:Double, toLat:Double, toLong:Double){
         
         let directionRequest = MKDirectionsRequest()
         
@@ -64,10 +56,10 @@ class ViewController: UIViewController {
         directionRequest.destination = destination
         
         //   directionRequest.requestsAlternateRoutes = true
-        directionRequest.transportType = MKDirectionsTransportType.Automobile;
+        directionRequest.transportType = MKDirectionsTransportType.automobile;
         
         let directions = MKDirections(request: directionRequest)
-        directions.calculateDirectionsWithCompletionHandler {
+        directions.calculate {
             (response, error) -> Void in
             if error != nil { print("Error calculating direction - \(error!.localizedDescription)") }
             else {
@@ -90,17 +82,12 @@ class ViewController: UIViewController {
         }
     }
     
-    
-    var startLocation:CLLocation!
-    var lastLocation: CLLocation!
-    var traveledDistance:Double = 0
-    
-    func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
+    func locationManager(_ manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         if startLocation == nil {
             startLocation = locations.first as? CLLocation
         } else {
-            let distance = startLocation.distanceFromLocation(locations.last as! CLLocation)
-            let lastDistance = lastLocation.distanceFromLocation(locations.last as! CLLocation)
+            let distance = startLocation.distance(from: locations.last as! CLLocation)
+            let lastDistance = lastLocation.distance(from: locations.last as! CLLocation)
             traveledDistance += lastDistance
             print( "\(startLocation)")
             print( "\(locations.last!)")
@@ -108,6 +95,4 @@ class ViewController: UIViewController {
             print("STRAIGHT DISTANCE: \(distance)")
         }
     }
-    
 }
-
